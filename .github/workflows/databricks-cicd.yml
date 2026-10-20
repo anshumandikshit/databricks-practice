@@ -44,6 +44,10 @@ jobs:
         run: |
           databricks bundle validate -t dev
 
+      - name: Bundle Summary
+        run: |
+          databricks bundle summary -t dev
+
   #################################################
   # DEV
   # Trigger: Push to feature/*
@@ -77,6 +81,10 @@ jobs:
         run: |
           databricks bundle deploy -t dev
 
+      - name: Bundle Summary
+        run: |
+          databricks bundle summary -t dev
+
   #################################################
   # QAT
   # Trigger: PR -> main
@@ -107,6 +115,10 @@ jobs:
       - name: Deploy to QAT
         run: |
           databricks bundle deploy -t qat
+
+      - name: Bundle Summary
+        run: |
+          databricks bundle summary -t qat
 
   # #################################################
   # # UAT
@@ -141,6 +153,10 @@ jobs:
   #       run: |
   #         databricks bundle deploy -t uat
 
+  #     - name: Bundle Summary
+  #       run: |
+  #         databricks bundle summary -t uat
+
   # #################################################
   # # PROD
   # # Trigger: After UAT succeeds
@@ -174,3 +190,7 @@ jobs:
   #     - name: Deploy to PROD
   #       run: |
   #         databricks bundle deploy -t prod
+
+  #     - name: Bundle Summary
+  #       run: |
+  #         databricks bundle summary -t prod
