@@ -1,0 +1,62 @@
+bundle:
+  name: databricks-practice
+
+variables:
+  storage_account:
+    description: Storage Account
+
+  keyvault_scope:
+    description: Secret Scope
+
+  environment:
+    description: Environment Name
+
+include:
+  - resources/*.yml
+  - jobs/*.yml
+  - pipelines/*.yml
+targets:
+
+  dev:
+    mode: development
+
+    workspace:
+      root_path: /Workspace/dev/databricks-practice
+
+    variables:
+      environment: DEV
+      storage_account: devstorage001
+      keyvault_scope: kv-dev-scope
+
+  qat:
+    mode: production
+
+    workspace:
+      root_path: /Workspace/qat/databricks-practice
+
+    variables:
+      environment: QAT
+      storage_account: qatstorage001
+      keyvault_scope: kv-qat-scope
+
+  # uat:
+  #   mode: production
+
+  #   workspace:
+  #     root_path: /Workspace/uat/databricks-practice
+
+  #   variables:
+  #     environment: UAT
+  #     storage_account: uatstorage001
+  #     keyvault_scope: kv-uat-scope
+
+  # prod:
+  #   mode: production
+
+  #   workspace:
+  #     root_path: /Workspace/prod/databricks-practice
+
+  #   variables:
+  #     environment: PROD
+  #     storage_account: prodstorage001
+  #     keyvault_scope: kv-prod-scope

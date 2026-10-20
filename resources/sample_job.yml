@@ -1,0 +1,15 @@
+resources:
+  jobs:
+
+    sample_job:
+
+      name: sample_job_${bundle.target}
+
+      tasks:
+
+        - task_key: load_sample
+
+          notebook_task:
+            notebook_path: ../src/notebooks/sample_notebook
+            base_parameters:
+              environment: ${var.environment}
