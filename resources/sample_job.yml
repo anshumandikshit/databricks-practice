@@ -10,6 +10,6 @@ resources:
         - task_key: load_sample
 
           notebook_task:
-            notebook_path: /Workspace/src/notebooks/sample_notebook
+            notebook_path: ../src/notebooks/sample_notebook
             base_parameters:
               environment: ${var.environment}
