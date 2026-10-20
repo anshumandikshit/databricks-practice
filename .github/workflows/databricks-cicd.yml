@@ -32,7 +32,7 @@ jobs:
 
       - name: Validate Asset Bundle
         run: |
-          databricks bundle validate
+          databricks bundle validate -t dev
 
   #################################################
   # DEV
