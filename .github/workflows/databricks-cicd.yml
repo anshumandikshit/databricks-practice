@@ -22,6 +22,11 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    environment: DEV
+    env:
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+      
     steps:
 
       - name: Checkout Code
@@ -34,7 +39,7 @@ jobs:
         run: |
           echo "HOST EXISTS: ${DATABRICKS_HOST:+YES}"
           echo "TOKEN EXISTS: ${DATABRICKS_TOKEN:+YES}"
-          
+
       - name: Validate Asset Bundle
         run: |
           databricks bundle validate -t dev
