@@ -11,6 +11,10 @@ variables:
   environment:
     description: Environment Name
 
+sync:
+  include:
+    - src/**
+
 include:
   - resources/*.yml
   - jobs/*.yml
