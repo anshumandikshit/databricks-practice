@@ -1,0 +1,196 @@
+name: Databricks CI/CD
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+      - 'release/**'
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+
+  #################################################
+  # VALIDATE
+  #################################################
+
+  validate:
+
+    runs-on: ubuntu-latest
+
+    environment: DEV
+    env:
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+      
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Debug Auth
+        run: |
+          echo "HOST EXISTS: ${DATABRICKS_HOST:+YES}"
+          echo "TOKEN EXISTS: ${DATABRICKS_TOKEN:+YES}"
+
+      - name: Validate Asset Bundle
+        run: |
+          databricks bundle validate -t dev
+
+      - name: Bundle Summary
+        run: |
+          databricks bundle summary -t dev
+
+  #################################################
+  # DEV
+  # Trigger: Push to feature/*
+  #################################################
+
+  deploy-dev:
+
+    needs: validate
+
+    if: |
+      github.event_name == 'push' &&
+      startsWith(github.ref, 'refs/heads/feature/')
+
+    runs-on: ubuntu-latest
+
+    environment: DEV
+
+    env:
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Deploy to DEV
+        run: |
+          databricks bundle deploy -t dev
+
+      - name: Bundle Summary
+        run: |
+          databricks bundle summary -t dev
+
+  #################################################
+  # QAT
+  # Trigger: PR -> main
+  #################################################
+
+  deploy-qat:
+
+    needs: validate
+
+    if: github.event_name == 'pull_request'
+
+    runs-on: ubuntu-latest
+
+    environment: QAT
+
+    env:
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Deploy to QAT
+        run: |
+          databricks bundle deploy -t qat
+
+      - name: Bundle Summary
+        run: |
+          databricks bundle summary -t qat
+
+  # #################################################
+  # # UAT
+  # # Trigger: Push to release/*
+  # #################################################
+
+  # deploy-uat:
+
+  #   needs: validate
+
+  #   if: |
+  #     github.event_name == 'push' &&
+  #     startsWith(github.ref, 'refs/heads/release/')
+
+  #   runs-on: ubuntu-latest
+
+  #   environment: UAT
+
+  #   env:
+  #     DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+  #     DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+  #   steps:
+
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v4
+
+  #     - name: Install Databricks CLI
+  #       uses: databricks/setup-cli@main
+
+  #     - name: Deploy to UAT
+  #       run: |
+  #         databricks bundle deploy -t uat
+
+  #     - name: Bundle Summary
+  #       run: |
+  #         databricks bundle summary -t uat
+
+  # #################################################
+  # # PROD
+  # # Trigger: After UAT succeeds
+  # # Use GitHub Environment Approval
+  # #################################################
+
+  # deploy-prod:
+
+  #   needs: deploy-uat
+
+  #   if: |
+  #     github.event_name == 'push' &&
+  #     startsWith(github.ref, 'refs/heads/release/')
+
+  #   runs-on: ubuntu-latest
+
+  #   environment: PROD
+
+  #   env:
+  #     DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+  #     DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+  #   steps:
+
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v4
+
+  #     - name: Install Databricks CLI
+  #       uses: databricks/setup-cli@main
+
+  #     - name: Deploy to PROD
+  #       run: |
+  #         databricks bundle deploy -t prod
+
+  #     - name: Bundle Summary
+  #       run: |
+  #         databricks bundle summary -t prod
