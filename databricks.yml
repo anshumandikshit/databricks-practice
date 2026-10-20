@@ -18,7 +18,7 @@ include:
 targets:
 
   dev:
-    mode: development
+    mode: production
 
     workspace:
       root_path: /Workspace/dev/databricks-practice
